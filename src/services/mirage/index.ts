@@ -1,4 +1,10 @@
-import { createServer, Factory, Model, Response } from "miragejs";
+import {
+  ActiveModelSerializer,
+  createServer,
+  Factory,
+  Model,
+  Response,
+} from "miragejs";
 import faker from "@faker-js/faker";
 
 type User = {
@@ -9,6 +15,10 @@ type User = {
 
 export function makeServer() {
   return createServer({
+    serializers: {
+      application: ActiveModelSerializer,
+    },
+
     models: {
       user: Model.extend<Partial<User>>({}),
     },
@@ -22,13 +32,13 @@ export function makeServer() {
           return faker.internet.email().toLowerCase();
         },
         createdAt() {
-          return faker.date.recent(10);
+          return faker.date.recent();
         },
       }),
     },
 
     seeds(server) {
-      server.createList("user", 200);
+      server.createList("user", 210);
     },
 
     routes() {
@@ -50,6 +60,7 @@ export function makeServer() {
 
         return new Response(200, { "x-total-count": String(total) }, { users });
       });
+      this.get("/users/:id");
       this.post("/users");
 
       this.namespace = "";
